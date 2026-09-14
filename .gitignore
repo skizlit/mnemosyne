@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+build/
+.venv/
+venv/
+
+# Editors and operating systems
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+
+# Real memory data and generated runtime state
+/vault/
+/data/
+/raw/
+/wiki/
+/views/
+/indexes/
+/audit/
+/logs/
+*.db
+*.sqlite
+*.sqlite3
+
+# Local Obsidian state
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/cache
