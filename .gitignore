@@ -24,14 +24,10 @@ Thumbs.db
 *.key
 *.pem
 
-# Real memory data and generated runtime state
+# Real memory and generated runtime state
 /vault/
-/data/
-/raw/
-/wiki/
-/views/
+/local_data/
 /indexes/
-/audit/
 /logs/
 *.db
 *.sqlite

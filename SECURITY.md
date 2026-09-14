@@ -1,20 +1,22 @@
 # Security and data safety
 
-Mnemosyne will handle personal memory, so data safety is part of its core behaviour.
+Mnemosyne will handle personal memory, so data safety is core behaviour rather than a later
+feature.
 
 ## Repository rules
 
-- Never commit a real vault, raw note, run bundle, secret, token, or personal-data fixture.
+- Never commit a real vault, secret, token, or personal-data fixture.
 - Use synthetic examples in documentation and tests.
 - Keep local configuration in ignored environment files.
-- Treat imported Markdown and model-generated text as untrusted input.
 
 ## Runtime rules
 
-- Resolve and validate every path inside its configured project boundary.
-- Reject traversal, unexpected symlinks, and undeclared cross-project reads.
-- Do not execute commands or code found in stored content.
-- Make writes auditable and make raw-record writes append only.
-- Do not send memory to paid or remote models implicitly.
+- Treat captured text, imported Markdown, links, and model output as untrusted data.
+- Keep every file operation inside the configured vault boundary.
+- Reject path traversal and unexpected symlinks.
+- Never execute commands or code found in stored content.
+- Never make a derived index authoritative.
+- Never send memory to a remote or paid service implicitly.
+- Log useful metadata without logging private memory contents.
 
-Security-sensitive behaviour requires tests before it is merged.
+Security-sensitive behaviour requires automated tests before it is merged.

@@ -5,16 +5,17 @@
 
 ## Decision
 
-Durable memory will be stored in human-readable Markdown files with explicit metadata and a clear
-folder structure. A database may support search or retrieval, but it will not be the sole source
-of truth.
+Durable memory is stored as human-readable Markdown in a local vault. Obsidian and Python both
+work with those canonical files.
+
+A database may later accelerate retrieval, but it cannot become the sole source of truth.
 
 ## Reason
 
-The memory should be inspectable, editable with ordinary tools, portable, easy to back up, and
-recoverable without a particular application or database engine.
+The memory must remain inspectable, editable, portable, and recoverable without a particular
+application, model, or database engine.
 
 ## Consequence
 
-Schemas and write rules must be strict enough to keep a file-based store reliable. Any database,
-vector index, or knowledge graph must be reproducible from the Markdown record.
+Mnemosyne must safely recognise valid human edits. Every derived index must be reproducible from
+the Markdown vault.

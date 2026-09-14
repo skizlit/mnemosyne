@@ -5,15 +5,15 @@
 
 ## Decision
 
-Compiled views, search databases, embeddings, and relationship graphs are derived products. They
-may be deleted and rebuilt from authoritative Markdown and the append-only audit history.
+SQLite indexes, embeddings, vector stores, and relationship graphs are optional derived products.
+They may be introduced only when they solve a measured retrieval problem, and they must be fully
+rebuildable from the Markdown vault.
 
 ## Reason
 
-This prevents a convenient retrieval tool from quietly becoming an irreplaceable second source
-of truth.
+A convenient search tool must not quietly become an irreplaceable second source of truth.
 
 ## Consequence
 
-Every derived format needs a deterministic rebuild path. A feature is incomplete if deleting its
-derived state causes durable information to be lost.
+Mnemosyne first proves file-based persistence and retrieval. Any future index needs a deterministic
+rebuild path and may be deleted without losing durable knowledge.

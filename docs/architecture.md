@@ -1,54 +1,68 @@
 # Architecture
 
-## Boundary
+## Purpose
 
-Mnemosyne is the memory subsystem, not the agent system around it. It accepts durable records,
-protects their history, and produces useful knowledge views for humans and authorised tools.
+Mnemosyne is a memory system only. It captures information, consolidates it into durable
+knowledge, retrieves relevant knowledge later, and applies corrections to the existing current
+truth.
 
-The NAS is the durable memory and control plane. A desktop, local model, or future Agent Manager
-is a replaceable compute client. Losing a compute client must not lose the memory.
+It starts from scratch. No storage layout, workflow, or component is inherited from Second Brain
+unless it independently proves useful for Mnemosyne.
 
-## Data flow
+## Components
 
-1. An authorised client submits a record or immutable run bundle.
-2. Mnemosyne validates its identity, project boundary, metadata, and attachments.
-3. The original input is written once to the raw record.
-4. Compilation produces readable project knowledge, indexes, and explicit relationships.
-5. Obsidian and retrieval tools consume compiled knowledge.
-6. Disposable indexes or graphs may be rebuilt entirely from the authoritative Markdown.
+### Markdown vault
 
-## Storage layers
+The vault contains the authoritative memory as ordinary Markdown. A person must be able to read,
+copy, back up, and repair it without Mnemosyne.
 
-| Layer | Purpose | Authority | Mutation rule |
-| --- | --- | --- | --- |
-| `raw/` | Original notes, imports, and run bundles | Authoritative evidence | Append only |
-| `wiki/` | Compiled project knowledge and indexes | Derived knowledge | Regenerated deliberately |
-| `views/` | Graphs, search indexes, and tool-specific projections | Disposable | Rebuild at any time |
-| `audit/` | Record of accepted writes and administrative actions | Authoritative history | Append only |
+The directory structure and document schema are deliberately undecided until their dedicated
+design tasks are completed.
 
-The exact vault schema will be specified and tested before implementation. These names describe
-roles, not permission for this source repository to contain real memory data.
+### Obsidian
 
-## Project isolation
+Obsidian opens the Markdown vault directly. It is the human interface for reading, editing,
+linking, and navigating memory. Mnemosyne must recognise valid edits made through Obsidian.
 
-Every stored item belongs to a project or an explicitly global area. Cross-project access is
-denied by default. Sharing happens through a deliberate promotion or synopsis with its source
-recorded; it is not inferred from filesystem proximity.
+Obsidian is not required for the Python engine to operate.
 
-## Agent run bundles
+### Python memory engine
 
-A future Agent Manager may export an immutable run bundle containing inputs, declared outputs,
-decisions, tool results suitable for retention, and provenance. Mnemosyne does not retain hidden
-reasoning or create separate private memories for individual agents.
+Python provides four responsibilities:
 
-## Obsidian
+1. Capture new information.
+2. Consolidate related information rather than blindly creating duplicates.
+3. Update current knowledge when a correction is accepted.
+4. Retrieve relevant knowledge for a later session.
 
-Obsidian is a human interface over compiled Markdown. It may add links and navigation metadata to
-the compiled knowledge area, but plugins, caches, layouts, and graph state are not authoritative.
-The memory must continue to work when Obsidian is closed or removed.
+Interfaces and external integrations sit outside the initial memory proof.
 
-## Safety boundary
+### Optional retrieval index
 
-Notes, imported content, and model output are untrusted data. No text stored in memory grants
-permission to run a command, load a plugin, cross a project boundary, or disclose a secret.
-Automation must use explicit allow-listed operations and validated paths.
+File and metadata retrieval will be proved first. SQLite, embeddings, vectors, or a knowledge
+graph may be evaluated later if measurements show that they improve recall.
+
+Any such index is disposable. Deleting it must not delete knowledge, and rebuilding it from
+Markdown must restore its complete state.
+
+## First vertical slice
+
+The first slice is intentionally small:
+
+1. Store one synthetic memory.
+2. construct a fresh engine instance from the same vault;
+3. retrieve that memory;
+4. correct it using its stable identity;
+5. construct another fresh engine instance; and
+6. retrieve only the corrected statement as current knowledge.
+
+Passing this test proves persistence across sessions and correct update behaviour. It does not
+claim that semantic retrieval, automatic capture, or integrations are solved.
+
+## Boundaries
+
+- Real personal memory never enters this source repository.
+- The vault location is configurable and may later live locally or on the NAS.
+- The core does not depend on a paid model, paid database, or paid cloud storage.
+- Stored content never grants permission to execute code or access another path.
+- A full agent harness, chat integration, and Jarvis-style interface are separate future projects.
