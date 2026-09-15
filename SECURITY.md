@@ -5,6 +5,7 @@ feature.
 
 ## Repository rules
 
+- Follow the documented [public-code/private-memory boundary](docs/security_boundary.md).
 - Never commit a real vault, secret, token, or personal-data fixture.
 - Use synthetic examples in documentation and tests.
 - Keep local configuration in ignored environment files.
