@@ -44,8 +44,9 @@ that Mnemosyne receives through external configuration.
 | `derived/` | Future indexes, caches, embeddings, or other reproducible retrieval data. | No |
 
 Project-owned directory and file names use `snake_case`. `.obsidian` is the sole named directory
-exception because Obsidian requires that tool-recognised name. The filename rules for source,
-knowledge, and output files are intentionally deferred to S1-03.
+exception because Obsidian requires that tool-recognised name. Decision 0006 defines the
+knowledge-document schema. The filename rules for source, knowledge, and output files are
+intentionally deferred to S1-03.
 
 ## Data-layer boundaries
 
@@ -90,8 +91,8 @@ derived state exclusively from the canonical vault.
 
 ## Synthetic example
 
-This example illustrates placement only. S1-02 and S1-03 will define the final Markdown schema,
-stable IDs, and filenames.
+This example illustrates placement only. Decision 0006 defines the Markdown knowledge schema and
+stable IDs. S1-03 will define filenames.
 
 ```text
 private_data/
