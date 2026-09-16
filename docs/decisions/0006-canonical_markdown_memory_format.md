@@ -79,6 +79,25 @@ library can do so safely. Exact whitespace, quoting style, key order, and commen
 guaranteed. An unknown field without the `x_` prefix is invalid so that a misspelled required field
 cannot silently become an extension.
 
+## Source-path boundary
+
+A stored source reference uses `/` separators, begins with `raw/`, and contains no empty, `.`, or
+`..` path component. It is never interpreted relative to the process working directory.
+
+Before reading a referenced source, Mnemosyne must:
+
+1. canonicalise the configured vault root and its `raw/` child;
+2. reject the reference if `raw/` or any referenced path component is a symbolic link;
+3. resolve the candidate against the canonical vault root;
+4. confirm the resolved candidate is a regular file strictly beneath the canonical `raw/` root;
+   and
+5. reject missing files and every candidate that fails either lexical or resolved containment.
+
+For example, `raw/casey_interview_transcript.txt` is valid when it resolves to an ordinary file
+inside the vault. `raw/imports/escape/report.txt` is invalid when `escape` is a symbolic link to a
+directory outside the vault, even though the stored string contains no `..` segment. These paths
+and names are wholly synthetic.
+
 ## Correction invariants
 
 All revisions of one logical memory share the same `id` and `created_at`.
@@ -239,7 +258,7 @@ Validation proceeds in this order:
 
 1. Decode the file as UTF-8 and safely parse exactly one YAML frontmatter block.
 2. Reject missing, duplicated, incorrectly typed, or unknown non-extension fields.
-3. Validate UUID, timestamp, status, tag, path, and extension-field provenance rules.
+3. Validate UUID, timestamp, status, tag, source-path, and extension-field provenance rules.
 4. Reject prohibited retrieval-derived metadata under both defined and extension fields.
 5. Validate correction relationships and agreement between `status` and directory placement.
 6. Require every correction reference to resolve to a reciprocal, same-`id` revision in the vault.
@@ -247,9 +266,10 @@ Validation proceeds in this order:
 8. Require a top-level title and non-empty Markdown body.
 9. Preserve valid `x_` mappings when a document is rewritten.
 
-Applying this checklist accepts all valid examples and rejects all invalid examples for the reasons
-stated. Parser implementation and executable fixtures belong to the later storage and validation
-tickets; this decision is their contract.
+The examples were walked through this checklist as design-time verification: the valid examples
+satisfy it and the invalid examples fail for the reasons stated. This is not executable conformance
+proof because no production parser exists yet. Issue #20 will implement parsing and validation with
+synthetic executable fixtures, including contained source paths and symbolic-link escape cases.
 
 ## Consequences
 
