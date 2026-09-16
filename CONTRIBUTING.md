@@ -14,8 +14,13 @@
 ## Before committing
 
 ```bash
+gitleaks git --config .gitleaks.toml --redact
+python tools/check_repository_safety.py
 ruff check .
 pytest
 ```
+
+See [`docs/repository_safety_checks.md`](docs/repository_safety_checks.md) for installation,
+allow-list, and remediation guidance.
 
 Commit messages should be imperative and describe one completed change.
