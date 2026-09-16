@@ -7,14 +7,14 @@ CODERABBIT_CONFIGURATION = REPOSITORY_ROOT / ".coderabbit.yaml"
 
 
 class CoderabbitConfigurationTests:
-    def test_reviews_are_automatic_for_non_draft_default_branch_pull_requests(self) -> None:
+    def test_reviews_are_automatic_for_non_draft_pull_requests_to_any_branch(self) -> None:
         configuration = self._load_configuration()
         auto_review = configuration["reviews"]["auto_review"]
 
         assert auto_review["enabled"] is True
         assert auto_review["auto_incremental_review"] is True
         assert auto_review["drafts"] is False
-        assert auto_review["base_branches"] == ["main"]
+        assert auto_review["base_branches"] == []
 
     def test_review_instructions_cover_repository_priorities(self) -> None:
         configuration = self._load_configuration()

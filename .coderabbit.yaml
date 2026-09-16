@@ -35,8 +35,7 @@ reviews:
     enabled: true
     auto_incremental_review: true
     drafts: false
-    base_branches:
-      - "main"
+    base_branches: []
   finishing_touches:
     docstrings:
       enabled: false
