@@ -17,8 +17,8 @@ The vault contains the authoritative memory as ordinary Markdown. A person must 
 copy, back up, and repair it without Mnemosyne.
 
 The canonical directory structure is defined in
-[decision 0005](decisions/0005-canonical_vault_layout.md). The Markdown document schema remains
-deliberately undecided until its dedicated design task is completed.
+[decision 0005](decisions/0005-canonical_vault_layout.md). The canonical knowledge-document
+format is defined in [decision 0006](decisions/0006-canonical_markdown_memory_format.md).
 
 ### Obsidian
 
