@@ -14,7 +14,7 @@ class CoderabbitConfigurationTests:
         assert auto_review["enabled"] is True
         assert auto_review["auto_incremental_review"] is True
         assert auto_review["drafts"] is False
-        assert auto_review["base_branches"] == []
+        assert auto_review["base_branches"] == ["main"]
 
     def test_review_instructions_cover_repository_priorities(self) -> None:
         configuration = self._load_configuration()
@@ -43,6 +43,12 @@ class CoderabbitConfigurationTests:
             feature["enabled"] is False
             for feature in finishing_touches.values()
         )
+
+    def test_irrelevant_docstring_coverage_check_is_disabled(self) -> None:
+        configuration = self._load_configuration()
+        pre_merge_checks = configuration["reviews"]["pre_merge_checks"]
+
+        assert pre_merge_checks["docstrings"]["mode"] == "off"
 
     def test_external_context_and_retained_knowledge_are_disabled(self) -> None:
         configuration = self._load_configuration()

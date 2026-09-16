@@ -35,7 +35,8 @@ reviews:
     enabled: true
     auto_incremental_review: true
     drafts: false
-    base_branches: []
+    base_branches:
+      - "main"
   finishing_touches:
     docstrings:
       enabled: false
@@ -49,6 +50,9 @@ reviews:
       enabled: false
     resolve_merge_conflict:
       enabled: false
+  pre_merge_checks:
+    docstrings:
+      mode: "off"
 
 chat:
   auto_reply: false
