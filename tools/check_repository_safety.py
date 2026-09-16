@@ -76,6 +76,7 @@ class Finding:
     rule: str
     path: Path
     line: int | None = None
+    revision: str | None = None
 
     def render(self, root: Path) -> str:
         try:
@@ -83,6 +84,8 @@ class Finding:
         except ValueError:
             display_path = self.path
         location = f"{display_path}:{self.line}" if self.line else str(display_path)
+        if self.revision:
+            location = f"{self.revision[:12]}:{location}"
         return f"{location}: blocked by {self.rule}"
 
 
@@ -93,6 +96,11 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         default=Path.cwd(),
         help="repository root (default: current directory)",
+    )
+    parser.add_argument(
+        "--history",
+        action="store_true",
+        help="scan every commit reachable from every local Git ref",
     )
     parser.add_argument("paths", nargs="*", type=Path, help="specific files or directories to scan")
     return parser.parse_args()
@@ -137,7 +145,7 @@ def requested_files(root: Path, paths: list[Path]) -> list[Path]:
     return files
 
 
-def path_finding(root: Path, path: Path) -> Finding | None:
+def path_finding(root: Path, path: Path, revision: str | None = None) -> Finding | None:
     try:
         relative = path.relative_to(root)
     except ValueError:
@@ -148,14 +156,31 @@ def path_finding(root: Path, path: Path) -> Finding | None:
     suffix = path.suffix.casefold()
 
     if parts and parts[0] in PROHIBITED_ROOTS:
-        return Finding("prohibited-private-root", path)
+        return Finding("prohibited-private-root", path, revision=revision)
     if ".obsidian" in parts or "@eadir" in parts:
-        return Finding("private-application-metadata", path)
+        return Finding("private-application-metadata", path, revision=revision)
     if name == ".env" or (name.startswith(".env.") and name != ".env.example"):
-        return Finding("private-environment-file", path)
+        return Finding("private-environment-file", path, revision=revision)
     if name in PROHIBITED_NAMES or suffix in PROHIBITED_SUFFIXES:
-        return Finding("sensitive-file-type", path)
+        return Finding("sensitive-file-type", path, revision=revision)
     return None
+
+
+def text_findings(
+    path: Path,
+    text: str,
+    placeholders: frozenset[str],
+    revision: str | None = None,
+) -> list[Finding]:
+    findings: list[Finding] = []
+    for line_number, line in enumerate(text.splitlines(), start=1):
+        assignment = PRIVATE_ASSIGNMENT.search(line)
+        if assignment and assignment.group(2) not in placeholders:
+            findings.append(Finding("private-config-value", path, line_number, revision))
+        for rule, pattern in CONTENT_RULES:
+            if pattern.search(line):
+                findings.append(Finding(rule, path, line_number, revision))
+    return findings
 
 
 def content_findings(path: Path, placeholders: frozenset[str]) -> list[Finding]:
@@ -163,16 +188,7 @@ def content_findings(path: Path, placeholders: frozenset[str]) -> list[Finding]:
         text = path.read_text(encoding="utf-8")
     except (OSError, UnicodeDecodeError):
         return []
-
-    findings: list[Finding] = []
-    for line_number, line in enumerate(text.splitlines(), start=1):
-        assignment = PRIVATE_ASSIGNMENT.search(line)
-        if assignment and assignment.group(2) not in placeholders:
-            findings.append(Finding("private-config-value", path, line_number))
-        for rule, pattern in CONTENT_RULES:
-            if pattern.search(line):
-                findings.append(Finding(rule, path, line_number))
-    return findings
+    return text_findings(path, text, placeholders)
 
 
 def scan(root: Path, paths: list[Path]) -> list[Finding]:
@@ -187,10 +203,55 @@ def scan(root: Path, paths: list[Path]) -> list[Finding]:
     return findings
 
 
+def git_output(root: Path, *arguments: str) -> bytes:
+    result = subprocess.run(
+        ["git", *arguments],
+        cwd=root,
+        check=False,
+        capture_output=True,
+    )
+    if result.returncode != 0:
+        raise RuntimeError(f"git command failed: git {arguments[0]}")
+    return result.stdout
+
+
+def scan_history(root: Path) -> list[Finding]:
+    placeholders = load_placeholders(root)
+    revisions = git_output(root, "rev-list", "--all").decode().splitlines()
+    findings: list[Finding] = []
+
+    for revision in revisions:
+        names = git_output(root, "ls-tree", "-r", "--name-only", "-z", revision)
+        for encoded_name in names.split(b"\0"):
+            if not encoded_name:
+                continue
+            relative_path = Path(encoded_name.decode())
+            display_path = root / relative_path
+            blocked_path = path_finding(root, display_path, revision)
+            if blocked_path:
+                findings.append(blocked_path)
+                continue
+
+            content = git_output(root, "show", f"{revision}:{relative_path.as_posix()}")
+            try:
+                text = content.decode("utf-8")
+            except UnicodeDecodeError:
+                continue
+            findings.extend(text_findings(display_path, text, placeholders, revision))
+    return findings
+
+
 def main() -> int:
     args = parse_args()
     root = args.root.resolve()
-    findings = scan(root, args.paths)
+    if args.history and args.paths:
+        print("--history cannot be combined with path arguments.", file=sys.stderr)
+        return 2
+    try:
+        findings = scan_history(root) if args.history else scan(root, args.paths)
+    except RuntimeError as error:
+        print(f"Repository safety check could not run: {error}", file=sys.stderr)
+        return 2
     if findings:
         print("Repository safety check failed:", file=sys.stderr)
         for finding in findings:

@@ -13,12 +13,14 @@ machine-specific configuration. Two independent checks enforce that boundary:
 Install Gitleaks, then run both checks from the repository root:
 
 ```bash
-gitleaks git --config .gitleaks.toml --redact
-python tools/check_repository_safety.py
+git fetch --no-tags origin '+refs/pull/*/head:refs/remotes/pull/*/head'
+gitleaks git --config .gitleaks.toml --redact --log-opts="--all"
+python tools/check_repository_safety.py --history
 ```
 
-The repository guard uses only the Python standard library. It scans Git-tracked files when run
-without path arguments. Pass one or more files or directories to scan a proposed subset.
+The history commands include commits reachable from branches, tags, and GitHub pull-request head
+refs. The repository guard uses only the Python standard library. Without `--history`, it scans
+current Git-tracked files; pass one or more paths to scan a proposed subset.
 
 ## Allow-list policy
 
