@@ -1,0 +1,65 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+
+language: "en-GB"
+early_access: false
+tone_instructions: >-
+  Be concise and direct. Report only actionable findings. State the risk, affected file or
+  behaviour, and a practical fix. Avoid praise and style-only comments unless a documented
+  repository rule is violated.
+
+reviews:
+  profile: "quiet"
+  request_changes_workflow: false
+  high_level_summary: true
+  review_status: true
+  review_details: false
+  poem: false
+  sequence_diagrams: false
+  estimate_code_review_effort: false
+  related_issues: false
+  related_prs: false
+  suggested_labels: false
+  suggested_reviewers: false
+  enable_prompt_for_ai_agents: false
+  path_filters: []
+  path_instructions:
+    - path: "**/*"
+      instructions: |
+        Review against AGENTS.md, local_rules.md, CONTRIBUTING.md, and SECURITY.md.
+        Prioritise correctness, data loss, public/private boundary violations, leaked secrets
+        or personal data, regressions, missing or weak tests, and unnecessary complexity.
+        Confirm tests prove the changed behaviour and mirror source paths where practical.
+        Challenge new dependencies or abstractions that do not materially simplify the change.
+        Do not request style-only changes unless they violate a documented repository rule.
+  auto_review:
+    enabled: true
+    auto_incremental_review: true
+    drafts: false
+    base_branches:
+      - "main"
+  finishing_touches:
+    docstrings:
+      enabled: false
+    unit_tests:
+      enabled: false
+    simplify:
+      enabled: false
+    autofix:
+      enabled: false
+    fix_ci:
+      enabled: false
+    resolve_merge_conflict:
+      enabled: false
+  pre_merge_checks:
+    docstrings:
+      mode: "off"
+
+chat:
+  auto_reply: false
+
+knowledge_base:
+  opt_out: true
+  web_search:
+    enabled: false
+  automatic_linking_mode: "disabled"
+  linked_repositories: []
