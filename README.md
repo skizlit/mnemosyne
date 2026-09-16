@@ -67,3 +67,6 @@ python -m pip install -e '.[dev]'
 ruff check .
 pytest
 ```
+
+Changes are reviewed through pull requests. See [Contributing](CONTRIBUTING.md) for the required
+CI, repository-safety, CodeRabbit, and final-approval checks.
