@@ -48,8 +48,14 @@ tests/                Tests mirroring the source structure
 .github/workflows/    Repository checks
 ```
 
-Real memory vaults, generated indexes, logs, and secrets must never be committed to this
-repository. Tests and examples use synthetic data only.
+## Security boundary
+
+This source repository is intended to be safe for public access. A real memory vault is private
+runtime data and must always remain outside the Git worktree. Tests and examples use synthetic
+data only.
+
+See [the public-code/private-memory boundary](docs/security_boundary.md) before adding files,
+examples, configuration, or tooling that handles a vault.
 
 ## Development
 
