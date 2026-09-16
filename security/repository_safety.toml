@@ -1,0 +1,9 @@
+# Allow only exact, visibly synthetic values in committed examples.
+# Additions require the same review as a source-code change.
+[allowlist]
+placeholder_values = [
+  "<private-vault-path>",
+  "<nas-host>",
+  "<nas-username>",
+  "<nas-share>",
+]
