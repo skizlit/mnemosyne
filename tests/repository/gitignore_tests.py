@@ -61,19 +61,19 @@ def _is_ignored(repository: Path, path: str) -> bool:
     return result.returncode == 0
 
 
-def test_private_and_machine_local_paths_are_ignored(tmp_path: Path) -> None:
-    shutil.copyfile(GITIGNORE, tmp_path / ".gitignore")
-    subprocess.run(["git", "init", "--quiet"], cwd=tmp_path, check=True)
+class GitignoreTests:
+    def test_private_and_machine_local_paths_are_ignored(self, tmp_path: Path) -> None:
+        shutil.copyfile(GITIGNORE, tmp_path / ".gitignore")
+        subprocess.run(["git", "init", "--quiet"], cwd=tmp_path, check=True)
 
-    unexpected = [path for path in IGNORED_PATHS if not _is_ignored(tmp_path, path)]
+        unexpected = [path for path in IGNORED_PATHS if not _is_ignored(tmp_path, path)]
 
-    assert unexpected == []
+        assert unexpected == []
 
+    def test_safe_examples_and_source_files_remain_trackable(self, tmp_path: Path) -> None:
+        shutil.copyfile(GITIGNORE, tmp_path / ".gitignore")
+        subprocess.run(["git", "init", "--quiet"], cwd=tmp_path, check=True)
 
-def test_safe_examples_and_source_files_remain_trackable(tmp_path: Path) -> None:
-    shutil.copyfile(GITIGNORE, tmp_path / ".gitignore")
-    subprocess.run(["git", "init", "--quiet"], cwd=tmp_path, check=True)
+        unexpected = [path for path in TRACKABLE_PATHS if _is_ignored(tmp_path, path)]
 
-    unexpected = [path for path in TRACKABLE_PATHS if _is_ignored(tmp_path, path)]
-
-    assert unexpected == []
+        assert unexpected == []

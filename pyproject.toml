@@ -20,6 +20,9 @@ dev = [
 addopts = "-ra"
 pythonpath = ["src"]
 testpaths = ["tests"]
+python_files = ["*_tests.py"]
+python_classes = ["*Tests"]
+python_functions = ["test_*"]
 
 [tool.ruff]
 line-length = 100
