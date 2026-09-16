@@ -14,7 +14,7 @@ class CoderabbitConfigurationTests:
         assert auto_review["enabled"] is True
         assert auto_review["auto_incremental_review"] is True
         assert auto_review["drafts"] is False
-        assert auto_review["base_branches"] == []
+        assert auto_review["base_branches"] == [".*"]
 
     def test_review_instructions_cover_repository_priorities(self) -> None:
         configuration = self._load_configuration()
