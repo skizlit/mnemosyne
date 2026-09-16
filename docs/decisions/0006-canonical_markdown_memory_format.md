@@ -81,6 +81,7 @@ All revisions of one logical memory share the same `id` and `created_at`.
 - Paired correction fields are reciprocal: revision `n + 1` supersedes revision `n`, and revision
   `n` is superseded by revision `n + 1`.
 - Each later revision has an `updated_at` later than the revision it supersedes.
+- Each `(id, revision)` pair is unique across the entire vault.
 - Exactly one revision for an `id` may have `status: current`.
 - Current files live beneath `knowledge/` but outside `knowledge/archive/`.
 - Archived files live beneath `knowledge/archive/`.
@@ -203,8 +204,9 @@ Validation proceeds in this order:
 2. Reject missing, duplicated, incorrectly typed, or unknown non-extension fields.
 3. Validate UUID, timestamp, status, tag, path, and extension-field rules.
 4. Validate correction relationships and agreement between `status` and directory placement.
-5. Require a top-level title and non-empty Markdown body.
-6. Preserve valid `x_` values when a document is rewritten.
+5. Reject duplicate `(id, revision)` pairs and multiple current revisions during a vault-wide scan.
+6. Require a top-level title and non-empty Markdown body.
+7. Preserve valid `x_` values when a document is rewritten.
 
 Applying this checklist accepts both valid examples and rejects both invalid examples for the
 reasons stated. Parser implementation and executable fixtures belong to the later storage and
