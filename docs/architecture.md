@@ -16,8 +16,9 @@ unless it independently proves useful for Mnemosyne.
 The vault contains the authoritative memory as ordinary Markdown. A person must be able to read,
 copy, back up, and repair it without Mnemosyne.
 
-The directory structure and document schema are deliberately undecided until their dedicated
-design tasks are completed.
+The canonical directory structure is defined in
+[decision 0005](decisions/0005-canonical_vault_layout.md). The Markdown document schema remains
+deliberately undecided until its dedicated design task is completed.
 
 ### Obsidian
 
