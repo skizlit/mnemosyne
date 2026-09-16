@@ -65,6 +65,8 @@ opening a note must not change `updated_at`.
 
 Extension fields must start with `x_` and must not duplicate or change a defined field's meaning.
 Their values are limited to JSON-compatible strings, numbers, booleans, nulls, lists, and mappings.
+Extension fields must not contain retrieval-derived metadata prohibited by this decision, regardless
+of the extension key's name.
 Mnemosyne should preserve the parsed key and value of an `x_` field when rewriting a document,
 where its YAML library can do so safely. Exact whitespace, quoting style, key order, and comments
 are not guaranteed. An unknown field without the `x_` prefix is invalid so that a misspelled
@@ -203,10 +205,11 @@ Validation proceeds in this order:
 1. Decode the file as UTF-8 and safely parse exactly one YAML frontmatter block.
 2. Reject missing, duplicated, incorrectly typed, or unknown non-extension fields.
 3. Validate UUID, timestamp, status, tag, path, and extension-field rules.
-4. Validate correction relationships and agreement between `status` and directory placement.
-5. Reject duplicate `(id, revision)` pairs and multiple current revisions during a vault-wide scan.
-6. Require a top-level title and non-empty Markdown body.
-7. Preserve valid `x_` values when a document is rewritten.
+4. Reject prohibited retrieval-derived metadata under both defined and extension fields.
+5. Validate correction relationships and agreement between `status` and directory placement.
+6. Reject duplicate `(id, revision)` pairs and multiple current revisions during a vault-wide scan.
+7. Require a top-level title and non-empty Markdown body.
+8. Preserve valid `x_` values when a document is rewritten.
 
 Applying this checklist accepts both valid examples and rejects both invalid examples for the
 reasons stated. Parser implementation and executable fixtures belong to the later storage and
