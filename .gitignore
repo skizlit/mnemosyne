@@ -1,10 +1,16 @@
-# Python
+# Python build and test state
 __pycache__/
 *.py[cod]
 *.egg-info/
 .pytest_cache/
 .ruff_cache/
+.mypy_cache/
+.pyright/
+.hypothesis/
+.tox/
+.nox/
 .coverage
+.coverage.*
 htmlcov/
 dist/
 build/
@@ -14,26 +20,76 @@ venv/
 # Editors and operating systems
 .idea/
 .vscode/
+*.code-workspace
 .DS_Store
 Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*~
 
-# Secrets and local configuration
+# Secrets and machine-local configuration
 .env
 .env.*
 !.env.example
 *.key
 *.pem
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.token
+.netrc
+credentials.json
+credentials.*.json
+secrets.json
+secrets.*.json
+config.local.*
+settings.local.*
+*.local.json
+*.local.toml
+*.local.yaml
+*.local.yml
 
-# Real memory and generated runtime state
+# Real memory, private imports, and runtime state
 /vault/
+/vaults/
+/memory/
+/memories/
+/notes/
+/attachments/
+/imports/
+/exports/
+/backups/
 /local_data/
+/runtime/
 /indexes/
+/embeddings/
+/vector_store/
+/cache/
 /logs/
+*.log
+*.log.*
 *.db
+*.db-*
 *.sqlite
+*.sqlite-*
 *.sqlite3
+*.sqlite3-*
+*.bak
+*.backup
+*.tmp
 
-# Local Obsidian state
-.obsidian/workspace.json
-.obsidian/workspace-mobile.json
-.obsidian/cache
+# Local Obsidian state that may reveal private paths or content
+**/.obsidian/workspace*.json
+**/.obsidian/cache/
+**/.obsidian/plugins/
+**/.obsidian/graph.json
+**/.obsidian/bookmarks.json
+**/.trash/
+
+# Synology metadata and administrative folders
+**/@eaDir/
+**/\#recycle/
+**/\#snapshot/
+**/.SynologyWorkingDirectory/
