@@ -64,13 +64,20 @@ opening a note must not change `updated_at`.
 | `aliases` | List of strings | Unique, non-empty human-readable names that Obsidian may use as aliases. |
 
 Extension fields must start with `x_` and must not duplicate or change a defined field's meaning.
-Their values are limited to JSON-compatible strings, numbers, booleans, nulls, lists, and mappings.
-Extension fields must not contain retrieval-derived metadata prohibited by this decision, regardless
-of the extension key's name.
-Mnemosyne should preserve the parsed key and value of an `x_` field when rewriting a document,
-where its YAML library can do so safely. Exact whitespace, quoting style, key order, and comments
-are not guaranteed. An unknown field without the `x_` prefix is invalid so that a misspelled
-required field cannot silently become an extension.
+Each extension value is a mapping with these fields:
+
+| Extension field | Type | Rule |
+| --- | --- | --- |
+| `provenance` | String | Exactly `human` or `source`; derived provenance is forbidden. |
+| `value` | Any safe value | A JSON-compatible string, number, boolean, null, list, or mapping. |
+| `source_ref` | String | Required only for `source` provenance and follows the same `raw/` path rules as `source_refs`. |
+
+No other keys are allowed inside an extension mapping. This provenance wrapper lets a validator
+reject retrieval-derived metadata regardless of the extension key's name. Mnemosyne should
+preserve the parsed key and mapping of a valid `x_` field when rewriting a document, where its YAML
+library can do so safely. Exact whitespace, quoting style, key order, and comments are not
+guaranteed. An unknown field without the `x_` prefix is invalid so that a misspelled required field
+cannot silently become an extension.
 
 ## Correction invariants
 
@@ -82,6 +89,7 @@ All revisions of one logical memory share the same `id` and `created_at`.
 - A current revision has no `superseded_by_revision`.
 - Paired correction fields are reciprocal: revision `n + 1` supersedes revision `n`, and revision
   `n` is superseded by revision `n + 1`.
+- Every referenced predecessor and successor exists in the vault with the same `id`.
 - Each later revision has an `updated_at` later than the revision it supersedes.
 - Each `(id, revision)` pair is unique across the entire vault.
 - Exactly one revision for an `id` may have `status: current`.
@@ -118,7 +126,9 @@ source_refs:
   - raw/casey_interview_transcript.txt
 aliases:
   - Casey editor preference
-x_reviewed_by: human
+x_reviewed_by:
+  provenance: human
+  value: human
 ---
 # Casey's editor preference
 
@@ -198,22 +208,48 @@ Casey prefers the **Nord** theme.
 This is invalid because revision `3` must supersede revision `2`, an archived revision must name
 revision `4` in `superseded_by_revision`, and the tag is not lowercase `snake_case`.
 
+### Orphaned correction reference
+
+Assume this is the only document in the vault with this `id`:
+
+```markdown
+---
+schema_version: 1
+id: "eaa4b42e-7790-495a-a259-4111cc03ea3f"
+revision: 2
+status: current
+created_at: "2026-09-16T16:00:00Z"
+updated_at: "2026-09-16T16:30:00Z"
+tags:
+  - editor_preferences
+supersedes_revision: 1
+---
+# Morgan's editor preference
+
+Morgan prefers a light editor theme.
+```
+
+This is invalid because revision `1` for the same `id` does not exist. A numerically plausible
+reference is insufficient; correction relationships must resolve during a vault-wide scan. Morgan
+is wholly synthetic.
+
 ## Validation checklist
 
 Validation proceeds in this order:
 
 1. Decode the file as UTF-8 and safely parse exactly one YAML frontmatter block.
 2. Reject missing, duplicated, incorrectly typed, or unknown non-extension fields.
-3. Validate UUID, timestamp, status, tag, path, and extension-field rules.
+3. Validate UUID, timestamp, status, tag, path, and extension-field provenance rules.
 4. Reject prohibited retrieval-derived metadata under both defined and extension fields.
 5. Validate correction relationships and agreement between `status` and directory placement.
-6. Reject duplicate `(id, revision)` pairs and multiple current revisions during a vault-wide scan.
-7. Require a top-level title and non-empty Markdown body.
-8. Preserve valid `x_` values when a document is rewritten.
+6. Require every correction reference to resolve to a reciprocal, same-`id` revision in the vault.
+7. Reject duplicate `(id, revision)` pairs and multiple current revisions during a vault-wide scan.
+8. Require a top-level title and non-empty Markdown body.
+9. Preserve valid `x_` mappings when a document is rewritten.
 
-Applying this checklist accepts both valid examples and rejects both invalid examples for the
-reasons stated. Parser implementation and executable fixtures belong to the later storage and
-validation tickets; this decision is their contract.
+Applying this checklist accepts all valid examples and rejects all invalid examples for the reasons
+stated. Parser implementation and executable fixtures belong to the later storage and validation
+tickets; this decision is their contract.
 
 ## Consequences
 
