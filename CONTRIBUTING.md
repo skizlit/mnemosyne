@@ -20,9 +20,14 @@ Read `AGENTS.md`, `local_rules.md`, and `SECURITY.md` before making changes. Jon
 Run the smallest relevant test, followed by:
 
 ```bash
+gitleaks git --config .gitleaks.toml --redact
+python tools/check_repository_safety.py
 ruff check .
 pytest
 ```
+
+See [`docs/repository_safety_checks.md`](docs/repository_safety_checks.md) for installation,
+allow-list, and remediation guidance.
 
 Inspect the final diff for unrelated files, secrets, syntax errors, and formatting problems.
 Issue-related commit subjects must start with `[<issue-number>]`.

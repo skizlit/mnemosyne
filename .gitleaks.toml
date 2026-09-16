@@ -1,0 +1,21 @@
+title = "Mnemosyne repository leak protection"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "mnemosyne-private-config-value"
+description = "Private Mnemosyne or NAS configuration value"
+regex = '''(?i)(MNEMOSYNE_VAULT_PATH|NAS_HOST|NAS_USERNAME|NAS_SHARE)\s*=\s*([^\s#]+)'''
+secretGroup = 2
+keywords = ["MNEMOSYNE_VAULT_PATH", "NAS_HOST", "NAS_USERNAME", "NAS_SHARE"]
+
+  [[rules.allowlists]]
+  description = "Exact placeholders permitted in public configuration examples"
+  regexTarget = "secret"
+  regexes = [
+    '''^<private-vault-path>$''',
+    '''^<nas-host>$''',
+    '''^<nas-username>$''',
+    '''^<nas-share>$''',
+  ]

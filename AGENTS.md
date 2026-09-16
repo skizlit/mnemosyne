@@ -37,6 +37,8 @@ python -m pip install -e '.[dev]'
 Run the smallest relevant test first, followed by:
 
 ```bash
+gitleaks git --config .gitleaks.toml --redact
+python tools/check_repository_safety.py
 ruff check .
 pytest
 ```
